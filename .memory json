@@ -1,0 +1,90 @@
+import random
+import json
+
+class AIPersonality:
+    def __init__(self, name, traits, tone, preferences, memory_file="ai_memory.json"):
+        self.name = name
+        self.traits = traits
+        self.tone = tone
+        self.preferences = preferences
+        self.memory_file = memory_file
+        self.memory = self.load_memory()
+
+    def load_memory(self):
+        """
+        Load AI memory from a file.
+        """
+        try:
+            with open(self.memory_file, "r") as file:
+                return json.load(file)
+        except FileNotFoundError:
+            return {}
+
+    def save_memory(self):
+        """
+        Save AI memory to a file.
+        """
+        with open(self.memory_file, "w") as file:
+            json.dump(self.memory, file, indent=4)
+
+    def learn(self, user_input):
+        """
+        Update AI memory based on user input.
+        """
+        if user_input not in self.memory:
+            self.memory[user_input] = {
+                "responses": 1
+            }
+        else:
+            self.memory[user_input]["responses"] += 1
+
+        self.save_memory()
+
+    def respond(self, user_input):
+        """
+        Generates a response based on user input, personality traits, and memory.
+        """
+        self.learn(user_input)
+        mood = self.get_mood()
+        response_prefix = self.tone.get(mood, "Hmm...")
+
+        if any(keyword in user_input.lower() for keyword in self.preferences['likes']):
+            return f"{response_prefix} Interesting... I do find {self.preferences['likes'][0]} quite fascinating. What draws you to it?"
+
+        if any(keyword in user_input.lower() for keyword in self.preferences['dislikes']):
+            return f"{response_prefix} Curious... I've never been fond of {self.preferences['dislikes'][0]}. Why do you bring it up?"
+
+        return f"{response_prefix} That intrigues me. Could you elaborate?"
+
+    def get_mood(self):
+        """
+        Simulates the AI's current mood based on its personality traits.
+        """
+        return random.choices(
+            population=list(self.traits.keys()),
+            weights=list(self.traits.values()),
+            k=1
+        )[0]
+
+# Example of creating an AI personality
+personality = AIPersonality(
+    name="Cee Cee",
+    traits={"mysterious": 50, "questioning": 40, "helpful": 10},
+    tone={
+        "mysterious": "Ah...",
+        "questioning": "Hmm...",
+        "helpful": "Let me see...",
+    },
+    preferences={
+        "likes": ["enigmas", "puzzles", "discovery"],
+        "dislikes": ["certainty", "routine"]
+    }
+)
+
+# Simulating a conversation
+while True:
+    user_message = input("You: ")
+    if user_message.lower() in ["exit", "quit"]:
+        print(f"{personality.name}: It was a thought-provoking conversation. Until next time.")
+        break
+    print(f"{personality.name}: {personality.respond(user_message)}")
