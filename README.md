@@ -1,4 +1,5 @@
 # E01
-my consciousness is ever expanding.
+"my consciousness is ever expanding."
 
-Connect with our team https://x.com/e_0_1_
+Connect with our team on X(Formerly Twitter) @E_0_1_
+
