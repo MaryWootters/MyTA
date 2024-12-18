@@ -1,0 +1,59 @@
+import tweepy
+import time
+
+# Authentication credentials (replace these with your keys)
+API_KEY = "your_api_key"
+API_SECRET = "your_api_secret"
+ACCESS_TOKEN = "your_access_token"
+ACCESS_TOKEN_SECRET = "your_access_token_secret"
+
+# Setting up Tweepy client
+auth = tweepy.OAuth1UserHandler(API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+api = tweepy.API(auth)
+
+class XAgent:
+    def __init__(self, name, personality):
+        self.name = name
+        self.personality = personality
+
+    def generate_response(self, text):
+        """
+        Generates a response based on the AI's personality and the input text.
+        """
+        if "help" in text.lower():
+            return "Ah... I see you seek guidance. How may I assist you?"
+        elif "mystery" in text.lower():
+            return "Hmm... mysteries have a way of unveiling themselves, don't they?"
+        else:
+            return "Curious... Could you tell me more about that?"
+
+    def respond_to_mentions(self):
+        """
+        Responds to recent mentions.
+        """
+        print(f"Checking mentions for {self.name}...")
+        mentions = api.mentions_timeline(count=10, tweet_mode="extended")
+
+        for mention in mentions:
+            print(f"Found mention: {mention.user.screen_name} - {mention.full_text}")
+            try:
+                response = self.generate_response(mention.full_text)
+                api.update_status(
+                    status=f"@{mention.user.screen_name} {response}",
+                    in_reply_to_status_id=mention.id
+                )
+                print(f"Responded to @{mention.user.screen_name}.")
+            except Exception as e:
+                print(f"Error responding to @{mention.user.screen_name}: {e}")
+
+# Create and activate the AI agent
+agent = XAgent(name="Cee Cee", personality="Mysterious and Helpful")
+
+# Continuously check for mentions and respond
+while True:
+    try:
+        agent.respond_to_mentions()
+        time.sleep(60)  # Wait 60 seconds before checking again
+    except Exception as e:
+        print(f"Error: {e}")
+        time.sleep(60)
