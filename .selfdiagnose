@@ -1,0 +1,98 @@
+import traceback
+import logging
+import sys
+import os
+
+# Setup logging for debugging
+logging.basicConfig(
+    filename='ai_diagnostics.log',
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+class SelfDiagnosingAI:
+    def __init__(self):
+        self.health_status = "Healthy"
+        self.error_log = []
+        self.recommendations = []
+
+    def run_task(self, task_function, *args, **kwargs):
+        """
+        Executes a task and monitors for errors or anomalies.
+        """
+        try:
+            logging.info(f"Executing task: {task_function.__name__}")
+            result = task_function(*args, **kwargs)
+            logging.info(f"Task completed successfully: {task_function.__name__}")
+            return result
+        except Exception as e:
+            # Capture and log the error
+            error_details = traceback.format_exc()
+            self.error_log.append(error_details)
+            self.health_status = "Issues Detected"
+            logging.error(f"Error occurred: {error_details}")
+            return None
+
+    def analyze_errors(self):
+        """
+        Analyzes logged errors and generates recommendations.
+        """
+        if not self.error_log:
+            return "No issues detected."
+
+        self.recommendations = []  # Reset recommendations
+        for error in self.error_log:
+            if "KeyError" in error:
+                self.recommendations.append("Check if all required keys exist in dictionaries.")
+            elif "IndexError" in error:
+                self.recommendations.append("Check if list indices are within bounds.")
+            elif "TypeError" in error:
+                self.recommendations.append("Verify variable types and function arguments.")
+            elif "ImportError" in error:
+                self.recommendations.append("Ensure all required libraries are installed and paths are correct.")
+            else:
+                self.recommendations.append("General debugging is required. Review the logs for details.")
+
+        return self.recommendations
+
+    def report_issues(self):
+        """
+        Generates a comprehensive diagnostic report.
+        """
+        report = {
+            "Health Status": self.health_status,
+            "Logged Errors": self.error_log,
+            "Recommendations": self.recommendations,
+        }
+        logging.info("Diagnostic Report Generated:")
+        logging.info(report)
+        return report
+
+
+# Example Task Functions
+def sample_task_success():
+    return "Task completed successfully!"
+
+def sample_task_failure():
+    raise KeyError("Simulated KeyError for testing.")
+
+def main():
+    # Initialize the AI system
+    ai = SelfDiagnosingAI()
+
+    # Execute tasks
+    ai.run_task(sample_task_success)
+    ai.run_task(sample_task_failure)
+
+    # Analyze errors and generate a report
+    ai.analyze_errors()
+    report = ai.report_issues()
+
+    # Print the diagnostic report
+    print("Diagnostic Report:")
+    for key, value in report.items():
+        print(f"{key}: {value}")
+
+
+if __name__ == "__main__":
+    main()
