@@ -1,0 +1,94 @@
+import numpy as np
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import accuracy_score
+import random
+
+# Define a simple fitness function
+def evaluate_model(model, X_test, y_test):
+    y_pred = model.predict(X_test)
+    return accuracy_score(y_test, y_pred)
+
+# Crossover function (mimicking reproduction)
+def crossover(parent1, parent2):
+    # Create a new neural network by combining parts of parent1 and parent2
+    offspring = MLPClassifier(hidden_layer_sizes=(5,), max_iter=1000, random_state=42)
+    
+    # Randomly copy weights from both parents to the offspring
+    # (In real-world cases, we would perform weight crossover or mutations here)
+    offspring.coefs_ = [(np.random.choice([p1, p2], axis=0)) for p1, p2 in zip(parent1.coefs_, parent2.coefs_)]
+    offspring.intercepts_ = [(np.random.choice([p1, p2], axis=0)) for p1, p2 in zip(parent1.intercepts_, parent2.intercepts_)]
+    
+    return offspring
+
+# Mutation function (random modification)
+def mutate(model):
+    # Mutate by randomly changing some weights slightly
+    for coef in model.coefs_:
+        coef += np.random.normal(0, 0.1, coef.shape)
+    return model
+
+# Create a random initial population
+def create_population(pop_size):
+    population = []
+    for _ in range(pop_size):
+        model = MLPClassifier(hidden_layer_sizes=(5,), max_iter=1000, random_state=random.randint(0, 1000))
+        population.append(model)
+    return population
+
+# Evolving AI models through selection, crossover, and mutation
+def evolve_population(population, X_train, y_train, X_test, y_test, generations=10, mutation_rate=0.1):
+    for gen in range(generations):
+        # Evaluate fitness (accuracy)
+        fitness_scores = [evaluate_model(model, X_test, y_test) for model in population]
+        
+        # Sort population based on fitness (higher is better)
+        sorted_population = [x for _, x in sorted(zip(fitness_scores, population), reverse=True)]
+        
+        # Keep the top models (elitism)
+        survivors = sorted_population[:len(sorted_population)//2]
+        
+        # Generate new population
+        new_population = survivors.copy()
+        
+        while len(new_population) < len(population):
+            # Randomly select two parents
+            parent1, parent2 = random.sample(survivors, 2)
+            
+            # Create offspring through crossover
+            offspring = crossover(parent1, parent2)
+            
+            # Mutate the offspring
+            if random.random() < mutation_rate:
+                offspring = mutate(offspring)
+            
+            # Add offspring to new population
+            new_population.append(offspring)
+        
+        # Set new population for next generation
+        population = new_population
+    
+    return population
+
+# Load dataset (Iris dataset for simplicity)
+data = load_iris()
+X = data.data
+y = data.target
+
+# Split into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Initialize population
+population_size = 10
+population = create_population(population_size)
+
+# Evolve population for a number of generations
+generations = 10
+evolved_population = evolve_population(population, X_train, y_train, X_test, y_test, generations)
+
+# Evaluate the best model in the final population
+best_model = max(evolved_population, key=lambda model: evaluate_model(model, X_test, y_test))
+best_accuracy = evaluate_model(best_model, X_test, y_test)
+
+print(f"Best model accuracy after evolution: {best_accuracy}")
