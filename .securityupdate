@@ -1,0 +1,85 @@
+import hashlib
+import hmac
+import logging
+from cryptography.fernet import Fernet
+from typing import List
+
+# Initialize logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
+
+# Generate encryption key (store securely in a real application)
+ENCRYPTION_KEY = Fernet.generate_key()
+cipher = Fernet(ENCRYPTION_KEY)
+
+# Sample user database
+USER_DB = {
+    "user1": hashlib.sha256("password123".encode()).hexdigest(),
+    "user2": hashlib.sha256("securepass456".encode()).hexdigest(),
+}
+
+# Role-based access control
+USER_ROLES = {
+    "user1": ["read", "write"],
+    "user2": ["read"],
+}
+
+def hash_password(password: str) -> str:
+    """Hash a password for secure storage."""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def authenticate(username: str, password: str) -> bool:
+    """Authenticate a user."""
+    hashed_password = hash_password(password)
+    if username in USER_DB and USER_DB[username] == hashed_password:
+        logging.info(f"Authentication successful for user: {username}")
+        return True
+    logging.warning(f"Authentication failed for user: {username}")
+    return False
+
+def authorize(username: str, action: str) -> bool:
+    """Authorize a user for a specific action."""
+    roles = USER_ROLES.get(username, [])
+    if action in roles:
+        logging.info(f"Authorization successful for user: {username} and action: {action}")
+        return True
+    logging.warning(f"Authorization failed for user: {username} and action: {action}")
+    return False
+
+def encrypt_data(data: str) -> str:
+    """Encrypt data before transmission or storage."""
+    encrypted = cipher.encrypt(data.encode())
+    logging.info("Data encrypted successfully.")
+    return encrypted.decode()
+
+def decrypt_data(encrypted_data: str) -> str:
+    """Decrypt data received or retrieved."""
+    decrypted = cipher.decrypt(encrypted_data.encode())
+    logging.info("Data decrypted successfully.")
+    return decrypted.decode()
+
+def log_access(username: str, action: str, success: bool):
+    """Log access attempts."""
+    status = "SUCCESS" if success else "FAILURE"
+    logging.info(f"Access log - User: {username}, Action: {action}, Status: {status}")
+
+# Example usage
+def ai_agent_action(username: str, password: str, action: str, data: str):
+    if authenticate(username, password):
+        if authorize(username, action):
+            encrypted_data = encrypt_data(data)
+            decrypted_data = decrypt_data(encrypted_data)
+            log_access(username, action, True)
+            return decrypted_data
+        else:
+            log_access(username, action, False)
+            raise PermissionError("Unauthorized action.")
+    else:
+        log_access(username, action, False)
+        raise PermissionError("Authentication failed.")
+
+# Testing the security protocol
+try:
+    response = ai_agent_action("user1", "password123", "write", "Sensitive Information")
+    print(f"Decrypted response: {response}")
+except PermissionError as e:
+    print(e)
