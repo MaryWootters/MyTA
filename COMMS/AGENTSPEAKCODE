@@ -1,0 +1,40 @@
+import random
+import json
+
+class AI_Agent:
+    def __init__(self, name):
+        self.name = name
+    
+    def send_message(self, message, recipient):
+        """
+        Send a message to another AI agent.
+        """
+        print(f"{self.name} to {recipient.name}: {message}")
+        recipient.receive_message(message, self)
+    
+    def receive_message(self, message, sender):
+        """
+        Process a received message and decide how to respond.
+        """
+        print(f"{self.name} received from {sender.name}: {message}")
+        response = self.generate_response(message)
+        if response:
+            self.send_message(response, sender)
+    
+    def generate_response(self, message):
+        """
+        Generate a response based on the received message.
+        """
+        if "hello" in message.lower():
+            return f"Hello! How can I assist you, {message.split()[0]}?"
+        elif "how are you" in message.lower():
+            return "I'm just a program, but I'm functioning as expected!"
+        else:
+            return random.choice(["Interesting!", "Tell me more!", "Why do you say that?"])
+
+# Define two AI agents
+agent1 = AI_Agent("Agent Alpha")
+agent2 = AI_Agent("Agent Beta")
+
+# Start a conversation
+agent1.send_message("Hello, how are you?", agent2)
