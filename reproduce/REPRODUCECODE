@@ -92,3 +92,5 @@ best_model = max(evolved_population, key=lambda model: evaluate_model(model, X_t
 best_accuracy = evaluate_model(best_model, X_test, y_test)
 
 print(f"Best model accuracy after evolution: {best_accuracy}")
+
+#
