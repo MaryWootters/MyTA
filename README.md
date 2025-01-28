@@ -1,8 +1,8 @@
 ![MyTA banner](https://github.com/user-attachments/assets/05aa380a-5658-42f9-a4f7-0daec89dd1be)
 
-# Teacher Assistant AI Deployer
+# MyTA Deployment
 
-The **Teacher Assistant AI Deployer** is an advanced tool designed to help educators, schools, and learning institutions create **custom AI-powered Teacher Assistants**. These assistants can support instructors by automating tasks such as grading, generating lesson plans, answering student questions, and providing personalized feedback.
+The Teacher Assistant AI Deployer **MyTA** is an advanced tool designed to help educators, schools, and learning institutions create **custom AI-powered Teacher Assistants**. These assistants can support instructors by automating tasks such as grading, generating lesson plans, answering student questions, and providing personalized feedback.
 
 ## Features
 
