@@ -1,1 +1,1 @@
-
+https://cdn.discordapp.com/attachments/705216884664041482/1333630021905940510/MyTA_banner.png?ex=6799973e&is=679845be&hm=c7654f01f2ab2c4dfcad84c3a5dadabb7066b7bfdb77ec6292c4117a6d2ba8d1&
