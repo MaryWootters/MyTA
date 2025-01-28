@@ -2,7 +2,7 @@
 
 # MyTA Deployment
 
-The Teacher Assistant AI Deployer **MyTA** is an advanced tool designed to help educators, schools, and learning institutions create **custom AI-powered Teacher Assistants**. These assistants can support instructors by automating tasks such as grading, generating lesson plans, answering student questions, and providing personalized feedback.
+The Teacher Assistant AI Deployer (**MyTA**) is an advanced tool designed to help educators, schools, and learning institutions create **custom AI-powered Teacher Assistants**. These assistants can support instructors by automating tasks such as grading, generating lesson plans, answering student questions, and providing personalized feedback.
 
 ## Features
 
