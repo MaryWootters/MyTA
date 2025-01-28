@@ -1,0 +1,72 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "tasks": {
+        "check-types": {
+            "dependsOn": ["build"]
+        },
+        "@MyTAos/agent#check-types": {
+            "dependsOn": [
+                "@MyTAos/plugin-solana#build",
+                "@MyTAos/plugin-direct#build"
+            ]
+        },
+        "build": {
+            "outputs": ["dist/**"],
+            "dependsOn": ["^@MyTAos/core#build"]
+        },
+        "@MyTAos/client-direct#build": {
+            "outputs": ["dist/**"],
+            "dependsOn": [
+                "@MyTAos/plugin-image-generation#build",
+                "@MyTAos/plugin-tee-log#build"
+            ]
+        },
+        "@MyTAos/plugin-solana#build": {
+            "outputs": ["dist/**"],
+            "dependsOn": [
+                "@MyTAos/plugin-trustdb#build",
+                "@MyTAos/plugin-tee#build"
+            ]
+        },
+        "@MyTAos/plugin-nft-generation#build": {
+            "outputs": ["dist/**"],
+            "dependsOn": ["@MyTAos/plugin-node#build"]
+        },
+        "@MyTAos/client-direct#build": {
+            "outputs": ["dist/**"],
+            "dependsOn": ["@MyTAos/plugin-tee-verifiable-log#build"]
+        },
+        "@MyTAos/plugin-tee-verifiable-log#build": {
+            "outputs": ["dist/**"],
+            "dependsOn": ["@MyTAos/core#build", "@MyTAos/plugin-tee#build"]
+        },
+        "@MyTAos/plugin-evm#build": {
+            "outputs": ["dist/**"],
+            "dependsOn": ["@MyTAos/plugin-tee#build"]
+        },
+        "@MyTAos/plugin-tee-log#build": {
+            "outputs": ["dist/**"],
+            "dependsOn": [
+                "@MyTAos/plugin-tee#build",
+                "@MyTAos/plugin-sgx#build"
+            ]
+        },
+        "@MyTAos/plugin-quai#build": {
+            "outputs": ["dist/**"],
+            "dependsOn": [
+                "@MyTAos/plugin-trustdb#build"
+            ]
+        },
+        "@MyTAos/plugin-lightning#build": {
+            "outputs": ["dist/**"],
+            "dependsOn": ["@MyTAos/plugin-tee#build"]
+        },
+        "MyTA-docs#build": {
+            "outputs": ["build/**"]
+        },
+        "dev": {
+            "persistent": true,
+            "cache": false
+        }
+    }
+}
