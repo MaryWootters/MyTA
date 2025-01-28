@@ -1,0 +1,81 @@
+class EssayGradingAgent:
+    def __init__(self, grading_criteria):
+        """
+        Initialize the grading agent with specific grading criteria.
+        :param grading_criteria: A dictionary with criteria names as keys and weights as values.
+        """
+        self.grading_criteria = grading_criteria
+
+    def grade_essay(self, essay_text):
+        """
+        Grades an essay based on the provided criteria.
+        :param essay_text: The essay to grade.
+        :return: A dictionary with scores for each criterion and overall feedback.
+        """
+        prompt = self._generate_prompt(essay_text)
+        response = self._get_gpt_response(prompt)
+        return self._parse_response(response)
+
+    def _generate_prompt(self, essay_text):
+        """
+        Generate a prompt to send to the AI model.
+        :param essay_text: The essay text to be graded.
+        :return: A formatted prompt.
+        """
+        criteria_description = "\n".join(
+            [f"{criterion}: {desc}" for criterion, desc in self.grading_criteria.items()]
+        )
+        prompt = (
+            f"You are an AI trained to assist teachers in grading essays. "
+            f"Grade the following essay based on these criteria:\n\n{criteria_description}\n\n"
+            f"Essay:\n{essay_text}\n\n"
+            "For each criterion, provide a score out of 10, followed by specific feedback. "
+            "Finally, give an overall summary of the essay."
+        )
+        return prompt
+
+    def _get_gpt_response(self, prompt):
+        """
+        Sends the prompt to the GPT model and retrieves a response.
+        :param prompt: The input prompt.
+        :return: The AI's response.
+        """
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[{"role": "system", "content": "You are a helpful assistant."},
+                          {"role": "user", "content": prompt}],
+                temperature=0.7
+            )
+            return response['choices'][0]['message']['content']
+        except Exception as e:
+            print(f"Error: {e}")
+            return None
+
+    def _parse_response(self, response):
+        """
+        Parse the AI's response into a structured format.
+        :param response: The raw response from the AI.
+        :return: A dictionary with scores and feedback.
+        """
+        # This is a simple parsing logic and can be enhanced based on response structure
+        return {"raw_feedback": response}
+
+
+# Example Usage
+if __name__ == "__main__":
+    criteria = {
+        "Content": "How well the essay addresses the topic and develops ideas.",
+        "Organization": "How logically the ideas are organized and transitions used.",
+        "Language": "Use of appropriate grammar, vocabulary, and sentence structure.",
+        "Creativity": "Originality and engagement of the writing."
+    }
+    
+    essay_text = """The world is facing numerous challenges, including climate change, economic inequality, and political instability. 
+    Addressing these issues requires collective action and innovative thinking. In this essay, I will discuss..."""
+    
+    grading_agent = EssayGradingAgent(criteria)
+    result = grading_agent.grade_essay(essay_text)
+    
+    print("Grading Results:")
+    print(result)
